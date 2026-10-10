@@ -1,7 +1,7 @@
 name: p3b-independent-real-docker
 on:
   push:
-    branches: [test/p3b-real-docker-consumer]
+    branches: [test/p3b-real-docker-consumer, test/p3b-revocation-authentication]
   pull_request:
     paths:
       - '.github/workflows/p3b-real-docker.yml'
@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install exact upstream implementation immutable commit
-        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@85f36acdd6bd1c35d884270147082a3cab26e323"
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@a8b31d1979980341aa4318fb1102400921b3cc8d"
       - name: Preload trusted container and bind local immutable image ID
         run: |
           docker pull python:3.13-alpine
