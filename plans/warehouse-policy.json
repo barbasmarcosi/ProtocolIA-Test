@@ -1,0 +1,22 @@
+{
+  "grants": {
+    "compute.literal": [
+      "*"
+    ],
+    "compute.sha256": [
+      "*"
+    ],
+    "compute.assert": [
+      "*"
+    ],
+    "kv.read": [
+      "warehouse/sku1"
+    ],
+    "kv.write": [
+      "warehouse/sku1"
+    ]
+  },
+  "max_actions": 8,
+  "max_writes": 1,
+  "max_duration_ms": 5000
+}
