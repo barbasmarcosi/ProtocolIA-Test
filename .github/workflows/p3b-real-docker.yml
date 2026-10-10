@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: '3.13'
       - name: Install exact upstream implementation immutable commit
-        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@475ff41175738e3a3494230f7f8d0903bf44b635"
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@a8b31d1979980341aa4318fb1102400921b3cc8d"
       - name: Preload trusted container and bind local immutable image ID
         run: |
           docker pull python:3.13-alpine
