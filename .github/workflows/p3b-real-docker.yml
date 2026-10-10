@@ -1,0 +1,27 @@
+name: p3b-independent-real-docker
+on:
+  push:
+    branches: [test/p3b-real-docker-consumer]
+  pull_request:
+    paths:
+      - '.github/workflows/p3b-real-docker.yml'
+      - 'tools/test_p3b_docker.py'
+permissions:
+  contents: read
+jobs:
+  independent:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install exact upstream implementation immutable commit
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@85f36acdd6bd1c35d884270147082a3cab26e323"
+      - name: Preload trusted container and bind local immutable image ID
+        run: |
+          docker pull python:3.13-alpine
+          echo "P3_DOCKER_IMAGE_ID=$(docker image inspect python:3.13-alpine --format '{{.Id}}')" >> "$GITHUB_ENV"
+      - name: Independent real-container attack/regression tests
+        run: python tools/test_p3b_docker.py
