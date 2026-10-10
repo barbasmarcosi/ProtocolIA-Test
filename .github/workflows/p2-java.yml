@@ -1,0 +1,55 @@
+name: p2-java-independent-http
+on:
+  push:
+    branches: [test/p2-java-spring-http]
+  pull_request:
+    paths:
+      - '.github/workflows/p2-java.yml'
+      - 'contracts/transactional-inventory.json'
+      - 'tools/test_java_p2.py'
+permissions:
+  contents: read
+jobs:
+  consumer-http:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: consumer
+          POSTGRES_PASSWORD: external-temp-db-password
+          POSTGRES_DB: protocolia
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U consumer"
+          --health-interval 3s
+          --health-timeout 5s
+          --health-retries 15
+    env:
+      DATABASE_URL: jdbc:postgresql://localhost:5432/protocolia
+      DATABASE_USER: consumer
+      DATABASE_PASSWORD: external-temp-db-password
+      PROTOCOLIA_ENABLE_MIGRATIONS: 'true'
+      PROTOCOLIA_USER: external-consumer
+      PROTOCOLIA_PASSWORD: external-ephemeral-password-2026
+      PROTOCOLIA_SCOPES: products.write,products.read,sales.create
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Install exact ProtocolIA candidate
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@eb9dc7acd80c7438189973baf106954d70b29ded"
+      - name: Compile independent contract and run generated server
+        run: |
+          protocolia generate-inventory-java contracts/transactional-inventory.json --out /tmp/downstream
+          mvn -B -f /tmp/downstream/pom.xml clean package
+          java -jar /tmp/downstream/target/generated-service-0.3.0.jar >/tmp/protocolia-external.log 2>&1 &
+          trap 'tail -n 130 /tmp/protocolia-external.log' EXIT
+          python tools/test_java_p2.py
