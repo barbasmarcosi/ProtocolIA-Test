@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install ProtocolIA from a pinned upstream commit
-        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@8da92628798a659d4992747ca0faa3c588340865"
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@9fe1e5ef262cbee263882e089929367ad237fbb6"
       - name: Execute independent consumer tests
         run: python -m unittest discover -s tests -v
       - name: Compile in a clean consumer directory
@@ -36,5 +36,7 @@ jobs:
       - name: Independently validate upstream v0.1 schema against consumer cases
         run: |
           python -m pip install jsonschema==4.25.1
-          curl --fail --location --silent --show-error "https://raw.githubusercontent.com/barbasmarcosi/ProtocolIA/8da92628798a659d4992747ca0faa3c588340865/schemas/contract-v0.1.schema.json" --output "$RUNNER_TEMP/contract-v0.1.schema.json"
+          curl --fail --location --silent --show-error "https://raw.githubusercontent.com/barbasmarcosi/ProtocolIA/9fe1e5ef262cbee263882e089929367ad237fbb6/schemas/contract-v0.1.schema.json" --output "$RUNNER_TEMP/contract-v0.1.schema.json"
           python tools/check_consumer_schema.py "$RUNNER_TEMP/contract-v0.1.schema.json"
+      - name: Independently verify compatibility diagnostics
+        run: python tools/check_compatibility.py
