@@ -1,0 +1,75 @@
+{
+  "version": "0.1",
+  "namespace": "InventoryConsumer",
+  "models": {
+    "HealthStatus": {
+      "status": {
+        "type": "string",
+        "required": true
+      }
+    },
+    "Item": {
+      "sku": {
+        "type": "string",
+        "required": true
+      },
+      "quantity": {
+        "type": "integer",
+        "required": true
+      },
+      "tags": {
+        "type": "string[]",
+        "required": false
+      },
+      "checked_at": {
+        "type": "datetime",
+        "required": false
+      }
+    },
+    "InventoryPage": {
+      "items": {
+        "type": "Item[]",
+        "required": true
+      },
+      "count": {
+        "type": "integer",
+        "required": true
+      }
+    }
+  },
+  "operations": {
+    "health": {
+      "method": "GET",
+      "path": "/system/health",
+      "response": "HealthStatus",
+      "capability": "public",
+      "effects": [],
+      "depends_on": []
+    },
+    "listItems": {
+      "method": "GET",
+      "path": "/inventory",
+      "response": "InventoryPage",
+      "capability": "inventory.read",
+      "effects": [
+        "read"
+      ],
+      "depends_on": [
+        "health"
+      ]
+    },
+    "addItem": {
+      "method": "POST",
+      "path": "/inventory",
+      "request": "Item",
+      "response": "Item",
+      "capability": "inventory.write",
+      "effects": [
+        "write"
+      ],
+      "depends_on": [
+        "listItems"
+      ]
+    }
+  }
+}
