@@ -53,6 +53,19 @@ with tempfile.TemporaryDirectory() as tmp:
 
 with tempfile.TemporaryDirectory() as tmp:
     root=Path(tmp)
+    first=execute(SAMPLE,POLICY,root,environment="consumer-freshness-1",wall_clock=lambda: 1000.0)
+    assert first["status"]=="executed"
+    assert execute(SAMPLE,POLICY,root,environment="consumer-freshness-1",wall_clock=lambda: 1000.5)["status"]=="replayed"
+    try:
+        execute(SAMPLE,POLICY,root,environment="consumer-freshness-1",wall_clock=lambda: 1601.0)
+    except ExecutionDenied as e:
+        assert "expired" in str(e),str(e)
+    else:raise AssertionError("expired evidence was replayed")
+    with sqlite3.connect(root/"protocolia-action.sqlite3") as db:
+        assert db.execute("SELECT COUNT(*) FROM executions").fetchone()[0]==1
+
+with tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp)
     forbidden=copy.deepcopy(SAMPLE)
     forbidden["actions"][2]["args"]["key"]="../host/file"
     try:execute(forbidden,POLICY,root,environment="external-consumer-1")

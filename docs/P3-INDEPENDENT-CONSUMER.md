@@ -1,6 +1,6 @@
 # P3 external action-plan consumer
 
-This repository owns its own warehouse task and host policy; both differ from upstream's examples. CI installs the immutable ProtocolIA commit cf5c532cfd638cfc2b60073582cbcd4d3173fbaa. Both Python 3.11 and 3.13 run a real CLI-to-SQLite sequence and independently inspect results.
+This repository owns its own warehouse task and host policy; both differ from upstream's examples. CI installs the immutable ProtocolIA commit ef5475e59989abb4845c1f1244810bd3c5fad9e6. The host policy includes a bounded evidence freshness window and the suite proves that evidence older than that window cannot be reused. Both Python 3.11 and 3.13 run a real CLI-to-SQLite sequence and independently inspect results.
 
 Safety checks: denied resources and unauthorized effects before any journal opens; rejects shell tool, path traversal, forged capability, budget overflow, stale environment or mutated state, cancellation and duplicate effect replays.
 

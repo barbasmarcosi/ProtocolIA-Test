@@ -24,6 +24,6 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install exact, immutable upstream candidate
-        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@b9e8728188aab941330845402b655c8e9fdd3490"
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@ef5475e59989abb4845c1f1244810bd3c5fad9e6"
       - name: Independent consumer adversarial checks
         run: python tools/check_p3_consumer.py
