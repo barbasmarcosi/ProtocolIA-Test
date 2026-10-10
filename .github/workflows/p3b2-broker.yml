@@ -1,0 +1,27 @@
+name: p3b2-independent-typed-docker
+on:
+  push:
+    branches: [test/p3b2-typed-broker-docker]
+  pull_request:
+    paths:
+      - '.github/workflows/p3b2-broker.yml'
+      - 'tools/test_p3b2_broker.py'
+permissions:
+  contents: read
+jobs:
+  independent-consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install exact immutable upstream ProtocolIA broker
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@67c87ad998936215e7a6c7d10d56645908afa21a"
+      - name: Preload and resolve trusted Docker content ID
+        run: |
+          docker pull python:3.13-alpine
+          echo "P3B2_IMAGE_ID=$(docker image inspect python:3.13-alpine --format '{{.Id}}')" >> "$GITHUB_ENV"
+      - name: Independent binary fixture and adversarial plan execution
+        run: python tools/test_p3b2_broker.py
