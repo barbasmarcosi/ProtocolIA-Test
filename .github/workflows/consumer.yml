@@ -1,0 +1,35 @@
+name: independent-consumer
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install ProtocolIA from a pinned upstream commit
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@788fe9d67cc3d6e502482a7f8e0eb766ac46a881"
+      - name: Execute independent consumer tests
+        run: python -m unittest discover -s tests -v
+      - name: Compile in a clean consumer directory
+        run: |
+          protocolia validate contracts/inventory.json
+          protocolia compile contracts/inventory.json --out "$RUNNER_TEMP/consumer-generated"
+      - name: Verify output using external OpenAPI tooling
+        run: |
+          python -m pip install openapi-spec-validator==0.7.2
+          python -c 'import json,os; from openapi_spec_validator import validate_spec; from pathlib import Path; p=Path(os.environ["RUNNER_TEMP"])/"consumer-generated/openapi.json"; validate_spec(json.loads(p.read_text())); print("OpenAPI consumer conformance: PASS")'
+      - name: Verify generated TypeScript with an independent compiler
+        run: |
+          npm install --no-save --ignore-scripts --no-audit --no-fund typescript@5.8.3
+          ./node_modules/.bin/tsc --strict --noEmit --skipLibCheck --target ES2022 "$RUNNER_TEMP/consumer-generated/types.ts"
