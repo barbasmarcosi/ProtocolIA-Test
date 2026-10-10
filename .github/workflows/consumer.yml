@@ -18,7 +18,7 @@ jobs:
         with:
           node-version: '22'
       - name: Install ProtocolIA from a pinned upstream commit
-        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@788fe9d67cc3d6e502482a7f8e0eb766ac46a881"
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@8da92628798a659d4992747ca0faa3c588340865"
       - name: Execute independent consumer tests
         run: python -m unittest discover -s tests -v
       - name: Compile in a clean consumer directory
@@ -33,3 +33,8 @@ jobs:
         run: |
           npm install --no-save --ignore-scripts --no-audit --no-fund typescript@5.8.3
           ./node_modules/.bin/tsc --strict --noEmit --skipLibCheck --target ES2022 "$RUNNER_TEMP/consumer-generated/types.ts"
+      - name: Independently validate upstream v0.1 schema against consumer cases
+        run: |
+          python -m pip install jsonschema==4.25.1
+          curl --fail --location --silent --show-error "https://raw.githubusercontent.com/barbasmarcosi/ProtocolIA/8da92628798a659d4992747ca0faa3c588340865/schemas/contract-v0.1.schema.json" --output "$RUNNER_TEMP/contract-v0.1.schema.json"
+          python tools/check_consumer_schema.py "$RUNNER_TEMP/contract-v0.1.schema.json"
