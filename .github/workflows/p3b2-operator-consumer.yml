@@ -1,0 +1,29 @@
+name: p3b2-independent-signed-operator
+on:
+  push:
+    branches: [test/p3b2-signed-operator-consumer]
+  pull_request:
+    paths:
+      - 'tools/test_operator_consumer.py'
+      - '.github/workflows/p3b2-operator-consumer.yml'
+permissions:
+  contents: read
+jobs:
+  consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install immutable upstream and Ed25519 dependency
+        run: |
+          python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@2e0a71b57a0a1b28ab04dda27314852436cb9039"
+          python -m pip install 'cryptography>=44,<47'
+      - name: Preload a trusted local Python image by content ID
+        run: |
+          docker pull python:3.13-alpine
+          echo "P3_DOCKER_IMAGE_ID=$(docker image inspect python:3.13-alpine --format '{{.Id}}')" >> "$GITHUB_ENV"
+      - name: Independent offline operator and live Docker attack tests
+        run: python tools/test_operator_consumer.py
