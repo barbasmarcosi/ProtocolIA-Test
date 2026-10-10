@@ -41,6 +41,18 @@ with tempfile.TemporaryDirectory() as tmp:
 
 with tempfile.TemporaryDirectory() as tmp:
     root=Path(tmp)
+    from concurrent.futures import ThreadPoolExecutor
+    def same_mission(_):
+        return execute(SAMPLE,POLICY,root,environment="consumer-concurrent-1")
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        outcomes=list(pool.map(same_mission,range(2)))
+    assert sorted(result["status"] for result in outcomes)==["executed","replayed"],outcomes
+    with sqlite3.connect(root/"protocolia-action.sqlite3") as db:
+        assert db.execute("SELECT COUNT(*) FROM events").fetchone()[0]==5
+        assert db.execute("SELECT COUNT(*) FROM executions").fetchone()[0]==1
+
+with tempfile.TemporaryDirectory() as tmp:
+    root=Path(tmp)
     forbidden=copy.deepcopy(SAMPLE)
     forbidden["actions"][2]["args"]["key"]="../host/file"
     try:execute(forbidden,POLICY,root,environment="external-consumer-1")
