@@ -31,6 +31,7 @@ assert call("GET","/health",auth=None)[0]==200
 assert call("POST","/products",{"sku":"x","quantity":2},auth=None)[0]==401
 assert call("POST","/products",{"sku":"x","quantity":2},auth=VIEWER)[0]==403
 assert call("POST","/products",{"sku":"x","quantity":-1})[0]==400
+assert call("POST","/products",{"sku":"x","quantity":2,"extraneous":"reject"})[0]==400
 sku="ind-"+uuid4().hex[:12]
 status,product=call("POST","/products",{"sku":sku,"quantity":1})
 assert status==200,(status,product)

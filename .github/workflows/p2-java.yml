@@ -47,7 +47,7 @@ jobs:
           distribution: temurin
           java-version: '21'
       - name: Install exact ProtocolIA candidate
-        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@8cc842c1f38c756714f21e2b5cb021987819cd11"
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@5b4f16733acd1dc6f14b1dec51aa22cd2d48ece7"
       - name: Compile independent contract and run generated server
         run: |
           protocolia generate-inventory-java contracts/transactional-inventory.json --out /tmp/downstream
