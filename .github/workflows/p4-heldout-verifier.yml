@@ -1,0 +1,25 @@
+name: p4-independent-task-verifier
+on:
+  push:
+    branches: [test/p4-independent-heldout-protocol]
+  pull_request:
+    paths:
+      - 'benchmarks/p4/tasks/**'
+      - 'tools/p4_verify.py'
+      - 'tests/test_p4_verify.py'
+      - '.github/workflows/p4-heldout-verifier.yml'
+permissions:
+  contents: read
+jobs:
+  freeze-candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Verify independent judges detect both valid and broken services
+        run: python -m unittest discover -s tests -p 'test_p4_verify.py' -v
+      - name: Task contract SHA256 fingerprints for preregistration
+        run: sha256sum benchmarks/p4/tasks/*.json

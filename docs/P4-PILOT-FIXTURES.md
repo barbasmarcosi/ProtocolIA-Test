@@ -1,0 +1,9 @@
+# P4 independent pilot fixtures: Java 21 Spring Boot 4
+
+Four task strata are independently specified in ProtocolIA-Test: fresh CRUD, domain invariant/concurrency, contract evolution, and hostile-input validation. An external black-box HTTP verifier tests a candidate running on loopback, using generated random identifiers and concurrent HTTP requests. Its own unit tests verify that a working minimal catalog passes and a broken always-200 server fails all four tasks.
+
+The candidate receives only the JSON task spec, **not** this verifier file. Verifier execution happens from a separate, read-only, version-pinned checkout after the coding agent terminates. The verifier uses loopback HTTP only and rejects remote/production URLs. Its JSON evidence captures the verifier commit, pass/fail state and SHA256 of its judge report; it is not a cryptographic witness or substitute for independent code review. Validation flags cover specified negative HTTP cases, not universal security guarantees.
+
+These are **pilot tasks**; they intentionally do not meet the entire P4 exit gate (notably real brownfield repository fixes, broader nonrepetitive algorithms and model-session economic comparisons are still outstanding). No Codex/Claude credentials or calls run in CI. All four scenarios are target-agnostic and require Java/Spring behavior; the ProtocolIA arm may need agent-written business code because generic generated routes are 501 stubs. Unsupported cases must be scored honestly, not removed or quietly rerun.
+
+Usage: boot the generated service on a disposable loopback port, then `python tools/p4_verify.py --task catalog-crud --base-url http://127.0.0.1:8765 --verifier-commit <pinned exact ProtocolIA-Test SHA> --out /private/verdict.json`. Run the other task IDs similarly. The verifier must not be imported into the agent worktree. Source and fixture SHAs must be pinned in the benchmark manifest BEFORE taking any result.
