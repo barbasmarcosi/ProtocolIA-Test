@@ -155,12 +155,13 @@ with tempfile.TemporaryDirectory(prefix="p3-consumer-host-") as tmp:
         verdicts=list(pool.map(reserve,range(6)))
     assert verdicts.count("reserved")==3,verdicts
     assert ledger.totals("missioncost")["remaining_micro_usd"]==1
-    ledger.started("operation0") if verdicts[0]=="reserved" else None
-    if verdicts[0]=="reserved":
-        usage={"version":"0.1","op_id":"operation0","provider":"modeladapter",
-               "receipt_id":"vendorproof0","actual_micro_usd":2}
-        assert ledger.settle(usage,sign_usage(usage,meter_key))["status"]=="settled"
-        assert ledger.totals("missioncost")["remaining_micro_usd"]==2
+    winner=verdicts.index("reserved")
+    winning_id="operation"+str(winner)
+    ledger.started(winning_id)
+    usage={"version":"0.1","op_id":winning_id,"provider":"modeladapter",
+           "receipt_id":"vendorproof0","actual_micro_usd":2}
+    assert ledger.settle(usage,sign_usage(usage,meter_key))["status"]=="settled"
+    assert ledger.totals("missioncost")["remaining_micro_usd"]==2
     unknown,signature=quote("unknownprice",3)
     unknown["max_micro_usd"]=None
     denied(lambda:ledger.reserve(unknown,signature,budget_ceiling=10),
