@@ -1,0 +1,139 @@
+{
+  "version": "0.2",
+  "namespace": "ConsumerInventory",
+  "models": {
+    "Health": {
+      "status": {
+        "type": "string",
+        "required": true
+      }
+    },
+    "ProductCreate": {
+      "sku": {
+        "type": "string",
+        "required": true,
+        "constraints": {
+          "minLength": 1,
+          "maxLength": 40,
+          "pattern": "^[A-Za-z0-9_-]+$"
+        }
+      },
+      "quantity": {
+        "type": "integer",
+        "required": true,
+        "constraints": {
+          "minimum": 0
+        }
+      }
+    },
+    "Product": {
+      "id": {
+        "type": "uuid",
+        "required": true
+      },
+      "sku": {
+        "type": "string",
+        "required": true
+      },
+      "quantity": {
+        "type": "integer",
+        "required": true
+      }
+    },
+    "StockResponse": {
+      "product_id": {
+        "type": "uuid",
+        "required": true
+      },
+      "stock": {
+        "type": "integer",
+        "required": true
+      }
+    },
+    "SaleRequest": {
+      "product_id": {
+        "type": "uuid",
+        "required": true
+      },
+      "quantity": {
+        "type": "integer",
+        "required": true,
+        "constraints": {
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "idempotency_key": {
+        "type": "uuid",
+        "required": true
+      }
+    },
+    "SaleResponse": {
+      "id": {
+        "type": "uuid",
+        "required": true
+      },
+      "product_id": {
+        "type": "uuid",
+        "required": true
+      },
+      "quantity": {
+        "type": "integer",
+        "required": true
+      },
+      "status": {
+        "type": "string",
+        "required": true
+      }
+    }
+  },
+  "operations": {
+    "health": {
+      "method": "GET",
+      "path": "/health",
+      "response": "Health",
+      "capability": "public",
+      "effects": [],
+      "depends_on": [],
+      "params": {}
+    },
+    "createProduct": {
+      "method": "POST",
+      "path": "/products",
+      "request": "ProductCreate",
+      "response": "Product",
+      "capability": "products.write",
+      "effects": [
+        "write"
+      ],
+      "depends_on": [],
+      "params": {}
+    },
+    "getStock": {
+      "method": "GET",
+      "path": "/products/{product_id}/stock",
+      "response": "StockResponse",
+      "capability": "products.read",
+      "effects": [
+        "read"
+      ],
+      "depends_on": [],
+      "params": {
+        "product_id": "uuid"
+      }
+    },
+    "registerSale": {
+      "method": "POST",
+      "path": "/sales",
+      "request": "SaleRequest",
+      "response": "SaleResponse",
+      "capability": "sales.create",
+      "effects": [
+        "read",
+        "write"
+      ],
+      "depends_on": [],
+      "params": {}
+    }
+  }
+}
