@@ -46,6 +46,8 @@ with tempfile.TemporaryDirectory(prefix="external-p3b-") as folder:
     denied(lambda:run(REQ,POLICY,inputs,workspace,now=lambda:101,**args),"stale")
     file.write_bytes(CONTENT)
     denied(lambda:run(REQ,POLICY,inputs,workspace,now=lambda:5000,**args),"expired")
+    denied(lambda:revoke(REQ["request_id"],workspace,secret=b"forged-host-secret-key-thirty-two-plus"),"invalid host revocation secret")
+    assert run(REQ,POLICY,inputs,workspace,now=lambda:101,**args)["status"]=="replayed"
     revoke(REQ["request_id"],workspace,secret=SECRET)
     denied(lambda:run(REQ,POLICY,inputs,workspace,now=lambda:101,**args),"revoked")
     denied(lambda:run(REQ,POLICY,inputs,workspace,subject="bad-actor",
