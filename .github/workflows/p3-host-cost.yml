@@ -1,0 +1,29 @@
+name: p3-independent-host-and-cost
+on:
+  push:
+    branches: [test/p3-host-service-cost-proof]
+  pull_request:
+    paths:
+      - 'tools/test_p3_host_and_cost.py'
+      - '.github/workflows/p3-host-cost.yml'
+permissions:
+  contents: read
+jobs:
+  outside-consumer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install exact immutable upstream host and ledger
+        run: |
+          python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@2be1cb4a800d492b774d67ad44cdf91e84dec468"
+          python -m pip install 'cryptography>=44,<47'
+      - name: Pin real, local Docker image
+        run: |
+          docker pull python:3.13-alpine
+          echo "P3_INDEPENDENT_DOCKER_ID=$(docker image inspect python:3.13-alpine --format '{{.Id}}')" >> "$GITHUB_ENV"
+      - name: Independent real Docker host UID and concurrent signed USD budget tests
+        run: python tools/test_p3_host_and_cost.py
