@@ -1,0 +1,112 @@
+{
+  "version": "0.2",
+  "namespace": "InventoryConsumer",
+  "models": {
+    "HealthStatus": {
+      "status": {
+        "type": "string",
+        "required": true
+      }
+    },
+    "Item": {
+      "sku": {
+        "type": "string",
+        "required": true,
+        "constraints": {
+          "minLength": 2,
+          "maxLength": 32,
+          "pattern": "^[A-Za-z0-9_-]+$"
+        }
+      },
+      "quantity": {
+        "type": "integer",
+        "required": true,
+        "constraints": {
+          "minimum": 0,
+          "maximum": 100000
+        }
+      },
+      "tags": {
+        "type": "string[]",
+        "required": false
+      },
+      "checked_at": {
+        "type": "datetime",
+        "required": false
+      },
+      "status": {
+        "type": "string",
+        "required": false,
+        "constraints": {
+          "enum": [
+            "available",
+            "reserved"
+          ]
+        }
+      }
+    },
+    "InventoryPage": {
+      "items": {
+        "type": "Item[]",
+        "required": true
+      },
+      "count": {
+        "type": "integer",
+        "required": true
+      }
+    }
+  },
+  "operations": {
+    "health": {
+      "method": "GET",
+      "path": "/system/health",
+      "response": "HealthStatus",
+      "capability": "public",
+      "effects": [],
+      "depends_on": [],
+      "params": {}
+    },
+    "listItems": {
+      "method": "GET",
+      "path": "/inventory",
+      "response": "InventoryPage",
+      "capability": "inventory.read",
+      "effects": [
+        "read"
+      ],
+      "depends_on": [
+        "health"
+      ],
+      "params": {}
+    },
+    "addItem": {
+      "method": "POST",
+      "path": "/inventory",
+      "request": "Item",
+      "response": "Item",
+      "capability": "inventory.write",
+      "effects": [
+        "write"
+      ],
+      "depends_on": [
+        "listItems"
+      ],
+      "params": {}
+    },
+    "getItem": {
+      "method": "GET",
+      "path": "/inventory/{sku}",
+      "params": {
+        "sku": "string"
+      },
+      "response": "Item",
+      "capability": "inventory.read",
+      "effects": [
+        "read"
+      ],
+      "depends_on": [
+        "listItems"
+      ]
+    }
+  }
+}
