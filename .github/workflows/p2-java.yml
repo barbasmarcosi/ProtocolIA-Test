@@ -35,6 +35,8 @@ jobs:
       PROTOCOLIA_USER: external-consumer
       PROTOCOLIA_PASSWORD: external-ephemeral-password-2026
       PROTOCOLIA_SCOPES: products.write,products.read,sales.create
+      PROTOCOLIA_VIEWER_USER: consumer-viewer
+      PROTOCOLIA_VIEWER_PASSWORD: consumer-readonly-password-2026
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -45,7 +47,7 @@ jobs:
           distribution: temurin
           java-version: '21'
       - name: Install exact ProtocolIA candidate
-        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@eb9dc7acd80c7438189973baf106954d70b29ded"
+        run: python -m pip install "git+https://github.com/barbasmarcosi/ProtocolIA.git@8cc842c1f38c756714f21e2b5cb021987819cd11"
       - name: Compile independent contract and run generated server
         run: |
           protocolia generate-inventory-java contracts/transactional-inventory.json --out /tmp/downstream

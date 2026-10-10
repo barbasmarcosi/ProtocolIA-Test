@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 ROOT="http://localhost:8080"
 ADMIN="Basic "+base64.b64encode(b"external-consumer:external-ephemeral-password-2026").decode()
+VIEWER="Basic "+base64.b64encode(b"consumer-viewer:consumer-readonly-password-2026").decode()
 
 def call(method,path,data=None,auth=ADMIN):
     headers={"Content-Type":"application/json"}
@@ -28,6 +29,7 @@ for _ in range(80):
 else:raise AssertionError("No generated Spring server became healthy")
 assert call("GET","/health",auth=None)[0]==200
 assert call("POST","/products",{"sku":"x","quantity":2},auth=None)[0]==401
+assert call("POST","/products",{"sku":"x","quantity":2},auth=VIEWER)[0]==403
 assert call("POST","/products",{"sku":"x","quantity":-1})[0]==400
 sku="ind-"+uuid4().hex[:12]
 status,product=call("POST","/products",{"sku":sku,"quantity":1})
