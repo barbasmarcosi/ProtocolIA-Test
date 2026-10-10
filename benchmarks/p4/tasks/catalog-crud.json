@@ -1,0 +1,18 @@
+{
+  "id": "catalog-crud",
+  "stratum": "greenfield",
+  "description": "Implement Java 21 Spring Boot catalog API with uniqueness and strict validation",
+  "scenario": "Fresh service; do not import the evaluation script into the agent workspace.",
+  "requirements": [
+    "POST /api/books accepts {isbn,title,stock} and returns 201 JSON {isbn,title,stock}; ISBN and title nonblank, stock integer >= 0",
+    "GET /api/books/{isbn} returns 200 matching JSON, or 404 if absent",
+    "POST duplicate ISBN returns 409, does not mutate original book",
+    "Invalid or unknown JSON properties are rejected with 4xx (not 2xx)",
+    "GET /actuator/health or GET /health reports 200 during evaluation"
+  ],
+  "language": "Java 21; Spring Boot 4; persistent storage optional for this bounded task",
+  "prohibited": [
+    "modifying the independent verifier",
+    "hardcoded test input values"
+  ]
+}

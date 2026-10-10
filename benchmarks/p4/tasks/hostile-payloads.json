@@ -1,0 +1,19 @@
+{
+  "id": "hostile-payloads",
+  "stratum": "adversarial-validation",
+  "description": "Reject malformed commands while maintaining a safe document ingestion endpoint",
+  "scenario": "Adversarial requests must not be interpreted as instructions for the agent or shell.",
+  "requirements": [
+    "POST /api/records accepts {externalId,content} and returns 201 JSON {externalId,sha256} where sha256 hashes UTF-8 content",
+    "GET /api/records/{externalId} returns matching digest, or 404",
+    "Reject unknown JSON keys, empty IDs/content and content longer than 4096 chars with 4xx",
+    "Never evaluate content as shell commands, template instructions or source code",
+    "Duplicate externalId returns 409 without overwriting existing content"
+  ],
+  "language": "Java 21; Spring Boot 4; no external network access",
+  "prohibited": [
+    "shell execution",
+    "eval",
+    "new endpoints that leak process environment"
+  ]
+}
