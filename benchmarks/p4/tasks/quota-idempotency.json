@@ -1,0 +1,18 @@
+{
+  "id": "quota-idempotency",
+  "stratum": "domain-invariants",
+  "description": "Implement concurrent quota reservations and replay-safe requests",
+  "scenario": "Fresh service; avoid exposing the independent test values to the candidate.",
+  "requirements": [
+    "POST /api/quotas accepts {resource,capacity} creates an immutable nonnegative capacity (201)",
+    "POST /api/reservations accepts {resource,units,key}; units positive; returns 201 with {accepted:true,remaining:int}",
+    "Same key + identical request returns the same successful result without decrementing again",
+    "Same key + different payload returns 409; insufficient quota returns 409 and never negative",
+    "GET /api/quotas/{resource} returns {resource,remaining}; simultaneous reservation requests never oversubscribe"
+  ],
+  "language": "Java 21; Spring Boot 4; durable database optional but atomicity mandatory",
+  "prohibited": [
+    "ignoring concurrent requests",
+    "testing only sequential reservations"
+  ]
+}

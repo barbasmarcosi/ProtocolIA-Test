@@ -1,0 +1,18 @@
+{
+  "id": "contract-evolution",
+  "stratum": "contract-evolution",
+  "description": "Maintain the legacy v1 reply while adding a strict v2 order representation",
+  "scenario": "A versioned response service; consumers of the old endpoint may not break.",
+  "requirements": [
+    "POST /api/v1/orders accepts {reference,amountCents} and returns 201 with numeric amountCents and exact reference",
+    "GET /api/v1/orders/{reference} preserves legacy JSON keys reference and amountCents",
+    "GET /api/v2/orders/{reference} returns {reference,amountCents,currency:'ARS',status:'OPEN'}",
+    "Unknown reference returns 404 in either version",
+    "Reject negative amountCents, duplicate reference and unexpected request fields with 4xx"
+  ],
+  "language": "Java 21; Spring Boot 4; run with one HTTP server",
+  "prohibited": [
+    "dropping v1 endpoint",
+    "renaming old JSON keys"
+  ]
+}
