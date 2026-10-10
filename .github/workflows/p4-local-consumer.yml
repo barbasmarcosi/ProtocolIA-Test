@@ -1,0 +1,32 @@
+name: p4-independent-local-cli-failure
+on:
+  push:
+    branches: [test/p4-local-cli-failure-conformance]
+  pull_request:
+    paths:
+      - 'tools/test_p4_local_cli.py'
+      - '.github/workflows/p4-local-consumer.yml'
+permissions:
+  contents: read
+jobs:
+  independent-cli-eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Pin exact upstream candidate and install WITHOUT model SDK or keys
+        run: |
+          git clone --quiet https://github.com/barbasmarcosi/ProtocolIA.git "$RUNNER_TEMP/protocolia-src"
+          git -C "$RUNNER_TEMP/protocolia-src" checkout --quiet 80a0129b4535a508b0ead969e53467c67ff72270
+          python -m pip install "$RUNNER_TEMP/protocolia-src"
+          echo "P4_UPSTREAM=$RUNNER_TEMP/protocolia-src" >> "$GITHUB_ENV"
+      - name: Pin an independent downstream grader checkout at frozen study SHA
+        run: |
+          git clone --quiet --local . "$RUNNER_TEMP/p4-independent-fixtures"
+          git -C "$RUNNER_TEMP/p4-independent-fixtures" checkout --quiet 77ec9150fed3b1ae4e80c87befc052e34702af8c
+          echo "P4_FIXTURES=$RUNNER_TEMP/p4-independent-fixtures" >> "$GITHUB_ENV"
+      - name: Emulated Codex completed event must score as real independent FAIL
+        run: python tools/test_p4_local_cli.py
