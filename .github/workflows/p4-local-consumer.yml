@@ -25,7 +25,7 @@ jobs:
           echo "P4_UPSTREAM=$RUNNER_TEMP/protocolia-src" >> "$GITHUB_ENV"
       - name: Pin an independent downstream grader checkout at frozen study SHA
         run: |
-          git clone --quiet --local . "$RUNNER_TEMP/p4-independent-fixtures"
+          git clone --quiet https://github.com/barbasmarcosi/ProtocolIA-Test.git "$RUNNER_TEMP/p4-independent-fixtures"
           git -C "$RUNNER_TEMP/p4-independent-fixtures" checkout --quiet 77ec9150fed3b1ae4e80c87befc052e34702af8c
           echo "P4_FIXTURES=$RUNNER_TEMP/p4-independent-fixtures" >> "$GITHUB_ENV"
       - name: Emulated Codex completed event must score as real independent FAIL
