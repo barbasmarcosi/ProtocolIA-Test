@@ -1,0 +1,89 @@
+{
+  "version": "0.4",
+  "plan_id": "consumer-warehouse-audit",
+  "actions": [
+    {
+      "id": "seed",
+      "tool": "literal",
+      "args": {
+        "value": "inventory-claimed"
+      },
+      "depends_on": [],
+      "capability": "compute.literal",
+      "effects": [],
+      "timeout_ms": 1000,
+      "output_type": "string"
+    },
+    {
+      "id": "hashed",
+      "tool": "sha256",
+      "args": {
+        "value": {
+          "from": "seed"
+        }
+      },
+      "depends_on": [
+        "seed"
+      ],
+      "capability": "compute.sha256",
+      "effects": [],
+      "timeout_ms": 1000,
+      "output_type": "string"
+    },
+    {
+      "id": "save",
+      "tool": "kv.put",
+      "args": {
+        "key": "warehouse/sku1",
+        "value": {
+          "from": "hashed"
+        }
+      },
+      "depends_on": [
+        "hashed"
+      ],
+      "capability": "kv.write",
+      "effects": [
+        "write"
+      ],
+      "timeout_ms": 1000,
+      "output_type": "string"
+    },
+    {
+      "id": "load",
+      "tool": "kv.read",
+      "args": {
+        "key": "warehouse/sku1"
+      },
+      "depends_on": [
+        "save"
+      ],
+      "capability": "kv.read",
+      "effects": [
+        "read"
+      ],
+      "timeout_ms": 1000,
+      "output_type": "string"
+    },
+    {
+      "id": "compare",
+      "tool": "assert.eq",
+      "args": {
+        "left": {
+          "from": "hashed"
+        },
+        "right": {
+          "from": "load"
+        }
+      },
+      "depends_on": [
+        "hashed",
+        "load"
+      ],
+      "capability": "compute.assert",
+      "effects": [],
+      "timeout_ms": 1000,
+      "output_type": "boolean"
+    }
+  ]
+}
