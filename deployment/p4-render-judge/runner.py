@@ -16,15 +16,15 @@ import urllib.request
 
 CANDIDATE = "https://protocolia-p4-java21-probe.onrender.com"
 PINNED_VERIFIER = "77ec9150fed3b1ae4e80c87befc052e34702af8c"
-CANDIDATE_PUBLISHED = "2cc3d6938c64b65f281ee10396f460d6dea13781"
-CANDIDATE_SUBTREE = "b08a7206ee3357eef9198f949c9c47b7d45a9489"
+CANDIDATE_PUBLISHED = "46c09bbc06e29775a14ad849e43861d7f459f3a3"
+CANDIDATE_SUBTREE = "2c30c61963753ea022bcd4d73bfc9250b8606843"
 NO_REDIRECTS = urllib.request.build_opener()
 NO_REDIRECTS.add_handler(type("BlockRedirect", (urllib.request.HTTPRedirectHandler,), {
     "redirect_request": lambda self,req,fp,code,msg,hdrs,newurl: None
 })())
 REPORT = {
     "status": "NOT_RUN",
-    "treatment": "C",
+    "treatment": "A",
     "source_commit": CANDIDATE_PUBLISHED,
     "candidate_workspace_tree": CANDIDATE_SUBTREE,
     "verifier_commit": PINNED_VERIFIER,
@@ -96,7 +96,7 @@ def run_once():
     proxy = http.server.ThreadingHTTPServer(("127.0.0.1",8765),Proxy)
     threading.Thread(target=proxy.serve_forever,daemon=True).start()
     try:
-        verdict = pathlib.Path("/tmp/p4-independent-c-verdict.json")
+        verdict = pathlib.Path("/tmp/p4-independent-a-verdict.json")
         args=["python","/app/tools/p4_verify.py","--task","catalog-crud",
             "--base-url","http://127.0.0.1:8765","--verifier-commit",PINNED_VERIFIER,
             "--out",str(verdict)]
