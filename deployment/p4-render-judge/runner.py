@@ -16,21 +16,21 @@ import urllib.request
 
 CANDIDATE = "https://protocolia-p4-java21-probe.onrender.com"
 PINNED_VERIFIER = "77ec9150fed3b1ae4e80c87befc052e34702af8c"
-CANDIDATE_PUBLISHED = "13596c5e499b918a36c8becc549d3b8b5ddb9b8b"
-CANDIDATE_SUBTREE = "85a1ea836de328fa7785ed81506f11713058717d"
+CANDIDATE_PUBLISHED = "2cc3d6938c64b65f281ee10396f460d6dea13781"
+CANDIDATE_SUBTREE = "b08a7206ee3357eef9198f949c9c47b7d45a9489"
 NO_REDIRECTS = urllib.request.build_opener()
 NO_REDIRECTS.add_handler(type("BlockRedirect", (urllib.request.HTTPRedirectHandler,), {
     "redirect_request": lambda self,req,fp,code,msg,hdrs,newurl: None
 })())
 REPORT = {
     "status": "NOT_RUN",
-    "treatment": "B",
+    "treatment": "C",
     "source_commit": CANDIDATE_PUBLISHED,
     "candidate_workspace_tree": CANDIDATE_SUBTREE,
     "verifier_commit": PINNED_VERIFIER,
     "verifier_unchanged": True,
     "build_test_compilation": "FAILED",
-    "runtime_launch": "classpath_no_candidate_code_changes",
+    "runtime_launch": "spring_boot_jar_without_candidate_code_changes",
 }
 
 class Proxy(http.server.BaseHTTPRequestHandler):
@@ -96,7 +96,7 @@ def run_once():
     proxy = http.server.ThreadingHTTPServer(("127.0.0.1",8765),Proxy)
     threading.Thread(target=proxy.serve_forever,daemon=True).start()
     try:
-        verdict = pathlib.Path("/tmp/p4-independent-b-verdict.json")
+        verdict = pathlib.Path("/tmp/p4-independent-c-verdict.json")
         args=["python","/app/tools/p4_verify.py","--task","catalog-crud",
             "--base-url","http://127.0.0.1:8765","--verifier-commit",PINNED_VERIFIER,
             "--out",str(verdict)]
